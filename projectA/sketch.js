@@ -13,11 +13,12 @@ function setup() {
   let cnv = createCanvas(800, 500); 
   cnv.parent("p5-canvas-container")
    generateNoiseFigures();
+
    
 }
 
 function draw() {
-  background(220);
+  background(220,30,120);
   // text("Make the cow stop running, or maybe he wants to changhe his location?" , 15, 12)
   // text("Try to age the cow:( or maybe otherwise", 15, 25);
   drawNoise();
