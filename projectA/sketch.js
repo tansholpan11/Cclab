@@ -19,6 +19,8 @@ let planetX = [];
 let planetY = [];
 let spd = [];
 let index =0;
+let noiseX = [];
+let noiseY = [];
 
 function setup() {
   let cnv = createCanvas(800, 500);
@@ -54,7 +56,7 @@ function draw() {
     drawPlanets();
     
 
-    if (frameCount > 100) {
+    if (frameCount > 500) {
         push();
       fill(255);
       rect(70, 100, 200, 100, 30);
@@ -201,19 +203,22 @@ function keyPressed() {
 }
 
 function drawNoise() {
-  for (let i = 0; i < noiseFigures.length; i++) {
-    let posX = noiseFigures[i].x;
-    let posY = noiseFigures[i].y;
+  for (let i = 0; i < noiseX.length; i++) {
+    let posX = noiseX[i];
+    let posY = noiseY[i];
     let r = random(-50, 50);
     line(posX, posY, posX + r, posY);
   }
 }
 
 function generateNoiseFigures() {
+  noiseX = [];
+  noiseY = [];
   for (let i = 0; i < 5; i++) {
     let x = random(width);
     let y = random(height);
-    noiseFigures.push({ x: x, y: y });
+    noiseX.push(x);
+    noiseY.push(y);
   }
 }
 
