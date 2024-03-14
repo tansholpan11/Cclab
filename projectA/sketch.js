@@ -21,6 +21,7 @@ let spd = [];
 let index =0;
 let noiseX = [];
 let noiseY = [];
+let jumpTimeout = 60;
 
 function setup() {
   let cnv = createCanvas(800, 500);
@@ -36,7 +37,6 @@ function setup() {
   centerX = width / 2;
   centerY = height / 2;
   generateNoiseFigures();
-  // generatePlanets();
   
 }
 
@@ -52,7 +52,6 @@ function draw() {
 
   if (scene == 0) {
     drawNoise();
-    // drawCircularPath();
     drawPlanets();
     
 
@@ -166,12 +165,7 @@ function drawCrazyEyes(x, y, speed, moving) {
 }
 
 function mousePressed() {
-  if (
-    mouseX > cow1x - 100 &&
-    mouseX < cow1x + 100 &&
-    mouseY > cow1y - 100 &&
-    mouseY < cow1y + 100
-  ) {
+  if ( mouseX > cow1x - 100 && mouseX < cow1x + 100 &&   mouseY > cow1y - 100 &&  mouseY < cow1y + 100 ) {
     moving = !moving;
     if (!moving) {
       stoppedX = mouseX;
@@ -183,7 +177,14 @@ function mousePressed() {
       scene = 1;
     }
   }
-
+  if (cow1x > 530 && cow1x < 770 && cow1y > 210 && cow1y < 350) {
+    //  cow's behavior
+    cowSpeedY = -10; // jump upwards
+    cowSpeedX = random(-5, 5); //   after the jump
+    originalSpeedX = cowSpeedX; // Store the original speed for later use
+    originalSpeedY = cowSpeedY; // Store the original speed for later use
+    moving = true; 
+  }
 }
 
 function keyPressed() {
@@ -237,9 +238,12 @@ function drawPlanets() {
     translate(width / 2, height/2);
     planetX[i] = sin(i + frameCount * spd[i])* (20+ i * 20)
     planetY[i] = cos(i + frameCount * spd[i])* (20+ i * 20)
-    circle(planetX[i], planetY[i], 30);
     let color;
-    color = (random(0, 255), random(0,255), random(0,255));
+    color = (random(10, 255), random(0,120), random(90,180));
+    fill(color);
+    noStroke();
+    circle(planetX[i], planetY[i], 30);
+  
     pop();
   }
   
@@ -260,7 +264,7 @@ function drawNewWorld() {
   triangle(100, 430, 500, 430, 300, 100);
   fill(200);
   triangle(290, 440, 500, 440, 400, 200);
-  fill(210)
+  fill(210);
   triangle(0, 440, 300, 440, 170, 100 );;
 
   // Draw the yurt
@@ -268,7 +272,16 @@ function drawNewWorld() {
   translate(650, 350); // Move the origin to the desired position
   drawYurt();
   pop();
-  if(cloudX > width + 30){
+
+  if (cow1x > 530 && cow1x < 770 && cow1y > 210 && cow1y < 350) {
+    // Draw Kazakh chocolate if cow is stopped at the yurt's location
+    drawKazakhChocolate(650, 280, 0.5); // Draw a smaller Kazakh chocolate
+  }
+
+  // else{
+  //   drawCow(cow1x, cow1y, 0.1, scaleValue);
+  // }
+  if(cloudX > width + 60){
     
     cloudX = 0;
     console.log(cloudX)
@@ -279,6 +292,38 @@ function drawNewWorld() {
   
   blue--;
 }
+function drawKazakhChocolate(x, y, scaleValue) {
+  push();
+  translate(x, y);
+  scale(scaleValue);
+
+  // Wrapper
+  fill(139, 69, 19); // Brown color for wrapper
+  rect(-20, 70, 250, 150); // Wrapper rectangle
+
+  // Chocolate bar
+  fill(139, 69, 19); // Brown color for chocolate
+  rect(-15, 75, 200, 80); // Chocolate rectangle
+
+  // Texture lines
+  stroke("blue");
+  strokeWeight(2);
+  for (let i = 0; i < 10; i++) {
+    line(-10 + i * 20, 75, -10 + i * 20, 155); // Vertical lines on chocolate
+  }
+
+  // Text
+  fill(255); // White color for text
+  textSize(16);
+  textAlign(CENTER);
+  text("Kazakh Chocolate", 78, 115); // Text: Chocolate name
+  text("Flavor: Milk", 78, 130); // Text: Chocolate flavor
+  text("Weight: 100g", 78, 145); // Text: Chocolate weight
+
+  pop();
+}
+
+
 
 function drawCloud(cloudX, cloudY) {
   
@@ -304,7 +349,7 @@ function drawYurt() {
   // Draw the main body of the yurt
   fill(255, 255, 255);
   stroke(0);
-  rect(-120, 0, 250, 140); // Adjust the height of the rectangle
+  rect(-120, 0, 250, 140); 
 
   // Draw the roof of the yurt
   fill(200, 0, 0);
@@ -312,7 +357,7 @@ function drawYurt() {
 
   // Draw the door of the yurt
   fill(100);
-  rect(-25, 40, 70, 100); // Adjust the position of the door
+  rect(-25, 40, 70, 100); 
 
   strokeWeight(10);
   fill("red");
@@ -320,10 +365,14 @@ function drawYurt() {
 
   strokeWeight(2);
   for (let i = 0; i < 10; i++) {
-    for (let i = 0; i < 5; i++) {
-      let x = i * 20 - 120;
-      let y = i * 2;
-      line(x, y, -70, -80);
+    for (let j = 0; j < 5; j++) {
+      let angle = TWO_PI / 10 * i; // Divide the circle into 10 sections
+      let radius = 100; 
+      let x1 = cos(angle) * radius;
+      let y1 = sin(angle) * radius; 
+      let x2 = -70; //  x of the center of the roof
+      let y2 = -80; //  y of the center of the roof
+      line(x1, y1, x2, y2); 
     }
   }
 }
