@@ -68,7 +68,7 @@ drawLowerBody(){
   for( let i = 0; i < 60; i+=5){
     // fill(255)
     let xp = map(i, 0, 60, 50, 120);
-    let yp = 10 * sin((frameCount - i) * 0.2)
+    let yp = 10 * sin((frameCount - i) * 0.2);
     circle(xp, yp, 20); 
   }
 
