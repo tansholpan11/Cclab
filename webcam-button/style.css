@@ -1,0 +1,21 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  display: block;
+}
+.confettiiButton{
+  width: 100px;
+  height: 70px;
+  
+}
+.secretButton{
+  cursor: pointer; 
+  font-weight: bold;
+  font-style: italic;
+}
+.secretButton:hover{
+  color: red;
+}

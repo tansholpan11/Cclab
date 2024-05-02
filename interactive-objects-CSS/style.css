@@ -1,0 +1,62 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  display: block;
+}
+.textBox p{
+  background-color: rgb(140, 120, 160);
+  margin-bottom:5px;
+}
+
+.textBox .miniheadline{
+  color: red;
+  background-color: cornflowerblue;
+}
+.specialHighlight{
+  color:white;
+  background-color: brown;
+}
+.textBox{
+  background-color: aquamarine;
+  width: 480px;
+  outline-color: black;
+  outline-width: 1px;
+  outline-style: dashed;
+
+  padding: 5px;
+  margin:5px;
+  margin-left: 5px;
+}
+
+.box1{
+  position: absolute;
+  left: 600px;
+  top: 40px;
+}
+.box2{
+  position: fixed;
+  left: 120px;
+  top:40px;
+}
+
+.box3{
+  position: relative;
+  left: 100px;
+  top:20px;
+}
+.relativeDescription{
+  position: relative;
+  left: 10px;
+  top: 20px;
+}
+#mainWrapper{
+  background-color: red;
+  width: 500px;
+  margin:auto;
+  padding: 30px;
+
+
+}
