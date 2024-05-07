@@ -1,7 +1,8 @@
 let currentSceneIndex = 1;
 let catRoomImg, citystreetImg, receptionistsImg; 
-let receptionImg, catImg;
+let receptionImg, catImg, elevatorImg;
 let suitcase1,suitcase2,suitcase3;
+let finalImg;
 let suitcases=[];
 let ball1, ball2, ball3;
 let notDraggedBalls =[];
@@ -16,6 +17,11 @@ let textButton = {};
 let carStopped = false;
 let firstMousePress = false;
 let messageDisplayed = false;
+let allLuggageCheckedIn = false;
+let elevatorY = 0;
+let elevatorMoving = false;
+
+let BgSound;
 
 
 function preload(){
@@ -25,12 +31,15 @@ function preload(){
   suitcase1 = loadImage("./assets/suitcase1.png"); 
   suitcase2= loadImage("./assets/suitcase2.png");
   suitcase3= loadImage("./assets/suitcase3.png");
-  ball1 = loadImage("./assets/ball-1.png")
-  ball2 = loadImage("./assets/ball-2.png")
-  ball3 = loadImage("./assets/ball-3.png")
+  ball1 = loadImage("./assets/ball-1.png");
+  ball2 = loadImage("./assets/ball-2.png");
+  ball3 = loadImage("./assets/ball-3.png");
+  BgSound = loadSound("./assets/BgMusic.mp3")
   
-  receptionistsImg = loadImage("./assets/recepcionist.jpeg")
-  receptionImg = loadImage("./assets/reception.png")
+  receptionistsImg = loadImage("./assets/recepcionist.jpeg");
+  receptionImg = loadImage("./assets/reception.png");
+  elevatorImg = loadImage("./assets/elivator.png");
+  finalImg = loadImage("./assets/final.png");
 
 } 
 
@@ -45,6 +54,9 @@ function setup() {
     width: 600,
     height: 120  // Adjust size to fit your text
   };
+  if (!BgSound.isPlaying()) {
+    BgSound.loop();  // Start the background music
+  }
   balls.push(new Ball(random(width),random(height) / 2, ball1));
   balls.push(new Ball(width / 2,height / 2, ball2));
   balls.push(new Ball(width / 2 - 200,height / 2 + 100, ball3));
@@ -171,6 +183,10 @@ function draw() {
     }
     pop();
     fill('#77182a');
+    
+    if ( currentSceneIndex == 3 && allLuggageCheckedIn == true) {
+      currentSceneIndex = 4;
+  }
  
   
     // Speech bubble for interaction prompt
@@ -187,17 +203,93 @@ function draw() {
     pop();
 
   
-  }
-  else if (currentSceneIndex == 4) {
-    // This code runs when the scene index is 4
-    background(255);
-    textSize(32);
-    fill(0);
-    textAlign(CENTER, CENTER);
-    text("Congratulations, all luggages are checked in!", width / 2, height / 2);
+  } else if(currentSceneIndex == 4){
+    drawElevator();
+  } else if(currentSceneIndex == 5){
+  
+    image(finalImg, width/2, height/2, width, height);
+    image(catImg, width/4, height/2, width - 200, height - 200 ); 
+
+    fill(255);
+    rect(900, 500, 440, 50, 10);
+    fill(92, 6, 35);
+    textSize(24); 
+    text("Congratulations you've found the cat!)",920,530);
   }
 
   pop();
+}
+
+function drawElevator() {
+  // Elevator frame and background
+  push();
+  fill('#333333');  // Dark grey for the elevator shaft
+  rect(width / 4, 0, width / 2, height);  // Draw the shaft covering the full height
+
+  // Elevator door
+  if (elevatorImg) {
+    image(elevatorImg, width / 2, elevatorY, width / 2, 800);  // Adjust the size as needed
+  } else {
+    fill('#ad1f0e');  // Fallback color if image fails to load
+    rect(width / 2, elevatorY, width / 2, 300);
+  }
+
+  // Elevator control panel
+  drawControlPanel();
+
+  // Moving text
+  if (elevatorMoving) {
+    textSize(20);
+    fill(255);  // White text
+    text("Moving to your floor...", width / 2, height - 50);
+  }
+  pop();
+}
+
+// Additional function to draw the elevator control panel
+function drawControlPanel() {
+  let panelX = width * 3 / 4 - 50;  // Position the panel on the right inside the elevator shaft
+  let panelY = height / 2 - 150;
+  let panelWidth = 80;
+  let panelHeight = 300;
+
+  fill('#666666');  // Grey panel
+  rect(panelX, panelY, panelWidth, panelHeight, 10);  // Rounded corners for the panel
+
+  // Buttons for floors
+  fill('#bbbbbb');  // Light grey buttons
+  let buttonSize = 20;
+  let buttonPadding = 35;
+  for (let i = 0; i < 5; i++) {  // Assume 5 buttons for different floors
+    ellipse(panelX + panelWidth / 2, panelY + 50 + i * buttonPadding, buttonSize, buttonSize);
+  }
+
+  // Floor indicator
+  fill(255); 
+  textSize(16);
+  textAlign(CENTER, CENTER);
+  text("Floor: " + Math.floor(elevatorY / 100), panelX + panelWidth / 2, panelY + 20);
+}
+
+function checkElevatorPosition() {
+  if (elevatorY >= height - 100) {
+    elevatorY = height - 100;
+    elevatorMoving = false;
+    currentSceneIndex = 5;
+  } else if (elevatorY < 0) {
+    elevatorY = 0;
+    elevatorMoving = false;
+  }
+}
+
+
+function mouseWheel(event) {
+  if (currentSceneIndex === 4) {
+    elevatorY += event.deltaY * 0.5;  
+    elevatorMoving = true;  
+    checkElevatorPosition();  
+  }
+  return false;  // Prevent default scrolling behavior
 }
 
 function drawCar(x, y, speed) {
@@ -267,7 +359,14 @@ function mousePressed() {
     firstMousePress = true;
     showIntroText = false;
   }
+  // if (currentSceneIndex == 1) {
+  //   if (BgSound.isPlaying()) {
+  //       BgSound.pause();
+  //   } else {
+  //       BgSound.loop();
+  //   }
 }
+
 function mouseReleased() {
   for( let i = 0; i < notDraggedBalls.length; i++){
     if( currentSceneIndex == 1 && notDraggedBalls[i].x > 1200 && notDraggedBalls[i].x < 1400 && notDraggedBalls[i].y > 610 && notDraggedBalls[i].y < 755){
@@ -291,45 +390,43 @@ function mouseReleased() {
 }
   
 
-  function checkSuitcasePlacement() {
-    let totalSuitcases = suitcases.length;
-    for (let i = suitcases.length - 1; i >= 0; i--) {
-      if (suitcases[i].x > 500 && suitcases[i].x < 1100 && suitcases[i].y > 300 && suitcases[i].y < 500) {
-        suitcases.splice(i, 1);  
-        suitcasesCheckedIn++;   
-      }
-    }
-  
-   
-    if (suitcasesCheckedIn == totalSuitcases) {
-      currentSceneIndex = 4;  
-    }
-  }
-
   // function checkSuitcasePlacement() {
   //   let totalSuitcases = suitcases.length;
-  //   let suitcasesCheckedIn = 0; 
-  
   //   for (let i = suitcases.length - 1; i >= 0; i--) {
   //     if (suitcases[i].x > 500 && suitcases[i].x < 1100 && suitcases[i].y > 300 && suitcases[i].y < 500) {
-  //       suitcases.splice(i, 1);
-  //       suitcasesCheckedIn++; 
+  //       suitcases.splice(i, 1);  
+  //       suitcasesCheckedIn++;   
   //     }
   //   }
   
    
-  //   if (suitcasesCheckedIn === totalSuitcases) {
-  //     currentSceneIndex = 2;
+  //   if (suitcasesCheckedIn == totalSuitcases) {
+  //     currentSceneIndex = 4;  
   //   }
   // }
 
-function keyPressed(){
-  if(currentSceneIndex == 1){
-    currentSceneIndex = 2;
-    } 
-    else{
-      currentSceneIndex ++;
+  function checkSuitcasePlacement() {
+    let suitcasesCheckedIn = 0;
+
+    for (let i = suitcases.length - 1; i >= 0; i--) {
+        if (suitcases[i].x > 500 && suitcases[i].x < 1100 && suitcases[i].y > 300 && suitcases[i].y < 500) {
+            suitcases.splice(i, 1);
+            suitcasesCheckedIn++;
+        }
     }
+
+    if (suitcasesCheckedIn == suitcases.length) {
+        allLuggageCheckedIn = true; // Set the flag when all suitcases are checked in
+    }
+}
+
+function keyPressed(){
+  if(currentSceneIndex == 3){
+    currentSceneIndex = 4;
+    } 
+    // else{
+    //   currentSceneIndex ++;
+    // }
   
 }
 class Ball{
@@ -377,7 +474,7 @@ class Ball{
   }
 }
 function mouseClicked() {
-  if (currentSceneIndex === 2) {
+  if (currentSceneIndex == 2) {
     let carWidth = 120;  
     let carHeight = 80;  
     let carY = height - 120;  
@@ -397,7 +494,7 @@ function mouseClicked() {
       messageDisplayed = false; 
     }
   }
-  if (currentSceneIndex === 1 && showIntroText &&
+  if (currentSceneIndex == 1 && showIntroText &&
       mouseX > width / 2 - textButton.width / 2 && mouseX < width / 2 + textButton.width / 2 &&
       mouseY > height / 2 - 250 - textButton.height / 2 && mouseY < height / 2 - 250 + textButton.height / 2) {
     showIntroText = false;  
